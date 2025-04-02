@@ -1,5 +1,5 @@
-  fastapi==0.78.0
-  pandas==1.3.3
-  uvicorn[standard]==0.17.6
-  openpyxl
-  numpy
+fastapi==0.78.0
+pandas==1.3.5
+numpy==1.21.6
+openpyxl==3.0.9
+uvicorn[standard]==0.17.6
