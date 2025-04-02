@@ -4,7 +4,10 @@ import pandas as pd
 app = FastAPI()
 
 # 读取大型客户表格数据（内置加载）
-df = pd.read_excel("客户.xlsx")
+try:
+    df = pd.read_excel("客户.xlsx")
+except Exception as e:
+    raise RuntimeError(f"无法读取客户.xlsx 文件: {e}")
 
 @app.get("/query")
 def query_keyword(keyword: str = Query(...)):
