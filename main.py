@@ -35,6 +35,7 @@ def query_keyword(keyword: str = Query(...)):
         "花费": safe_sum("花费"),
         "每次点击成本(CPC)": int(safe_sum("每次点击成本(CPC)")),
         "7天总销售额": safe_sum("7天总销售额"),
+        "ACOS销售额": safe_sum("7天总销售额")/safe_sum("花费"),
     }
 
     rows = matches.fillna("").to_dict(orient="records")
