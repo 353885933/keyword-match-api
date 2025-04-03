@@ -1,12 +1,22 @@
+from fastapi import FastAPI, Query
 from fastapi.responses import JSONResponse
+import pandas as pd
 import math
 
+app = FastAPI()  # ✅ 先定义 app
+
+# 尝试读取 Excel 文件
+try:
+    df = pd.read_excel("客户.xlsx")
+except Exception as e:
+    raise RuntimeError(f"无法读取客户.xlsx 文件: {e}")
+
+# ✅ 然后再注册路由
 @app.get("/query")
 def query_keyword(keyword: str = Query(...)):
     if "客户搜索词" not in df.columns:
         return JSONResponse(status_code=500, content={"error": "数据表缺少 '客户搜索词' 字段。"})
 
-    # 完全匹配关键词（忽略大小写与空格）
     matches = df[df["客户搜索词"].str.strip().str.lower() == keyword.strip().lower()]
 
     if matches.empty:
@@ -27,4 +37,10 @@ def query_keyword(keyword: str = Query(...)):
         "7天总销售额": safe_sum("7天总销售额"),
     }
 
-    rows = matches.fillna("").to_dict_
+    rows = matches.fillna("").to_dict(orient="records")
+
+    return {
+        "match": True,
+        "rows": rows,
+        "summary": summary
+    }
