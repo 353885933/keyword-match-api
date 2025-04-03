@@ -21,7 +21,7 @@ def query_keyword(keyword: str = Query(...)):
         "展示量": int(matches["展示量"].sum()),
         "点击量": int(matches["点击量"].sum()),
         "花费": round(matches["花费"].sum(), 2),
-        "每次点击成本": int(matches["每次点击成本"].sum()),
+        "每次点击成本(CPC)": int(matches["每次点击成本(CPC)"].sum()),
         "7天总销售额": round(matches["7天总销售额"].sum(), 2),
     }
 
