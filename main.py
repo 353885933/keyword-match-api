@@ -1,9 +1,10 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Body
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 import pandas as pd
 import math
 
-app = FastAPI()  # ✅ 先定义 app
+app = FastAPI()
 
 # 尝试读取 Excel 文件
 try:
@@ -11,9 +12,21 @@ try:
 except Exception as e:
     raise RuntimeError(f"无法读取客户.xlsx 文件: {e}")
 
-# ✅ 然后再注册路由
+# ✅ GET 请求
 @app.get("/query")
 def query_keyword(keyword: str = Query(...)):
+    return handle_query(keyword)
+
+# ✅ POST 请求：供 Coze 插件调用
+class KeywordPayload(BaseModel):
+    keyword: str
+
+@app.post("/query")
+def query_keyword_post(payload: KeywordPayload = Body(...)):
+    return handle_query(payload.keyword)
+
+# ✅ 公共处理函数，避免代码重复
+def handle_query(keyword: str):
     if "客户搜索词" not in df.columns:
         return JSONResponse(status_code=500, content={"error": "数据表缺少 '客户搜索词' 字段。"})
 
@@ -35,7 +48,7 @@ def query_keyword(keyword: str = Query(...)):
         "花费": safe_sum("花费"),
         "每次点击成本(CPC)": int(safe_sum("每次点击成本(CPC)")),
         "7天总销售额": safe_sum("7天总销售额"),
-        "ACOS销售额": safe_sum("7天总销售额")/safe_sum("花费"),
+        "ACOS销售额": safe_sum("7天总销售额") / safe_sum("花费") if safe_sum("花费") > 0 else None,
     }
 
     rows = matches.fillna("").to_dict(orient="records")
